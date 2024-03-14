@@ -44,7 +44,6 @@ controls.enableDamping = true;
 
 //controls.update() must be called after any manual changes to the camera's transform
 camera.position.set(0, 3, 3);
-controls.update();
 
 const tick = () => {
   requestAnimationFrame(tick);

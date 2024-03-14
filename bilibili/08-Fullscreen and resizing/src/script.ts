@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-console.info("OrbitControls", OrbitControls);
 
 /**
  * Base
@@ -10,9 +9,22 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Sizes
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
+
+window.addEventListener("resize", () => {
+  // Update sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  // Update camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height);
+});
 
 // Scene
 const scene = new THREE.Scene();
@@ -31,6 +43,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
+camera.position.set(0, 3, 3);
+camera.lookAt(mesh.position);
 scene.add(camera);
 
 // Renderer
@@ -39,10 +53,14 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+// controls.enabled = false;
 
 const tick = () => {
   requestAnimationFrame(tick);
 
+  controls.update();
 
   renderer.render(scene, camera);
 };
