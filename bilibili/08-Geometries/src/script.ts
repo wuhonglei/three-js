@@ -44,10 +44,19 @@ window.addEventListener("dblclick", () => {
 // Scene
 const scene = new THREE.Scene();
 
+const count = 50; // 50 个三角形
+const pointArray = new Array(count * 3 * 3)
+  .fill(undefined)
+  .map((_) => Math.random() - 0.5);
+const positionArray = new Float32Array(pointArray);
+const positionAttribute = new THREE.BufferAttribute(positionArray, 3);
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute("position", positionAttribute);
+
 // Object
 const mesh = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
-  new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  geometry,
+  new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
 );
 scene.add(mesh);
 
@@ -58,7 +67,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(0, 3, 3);
+camera.position.set(0, 0, 3);
 camera.lookAt(mesh.position);
 scene.add(camera);
 
