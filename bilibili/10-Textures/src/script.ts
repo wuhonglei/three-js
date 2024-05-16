@@ -3,6 +3,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import doorUrl from "./assets/door.jpeg";
 import iceUrl from "./assets/ice_surface.jpeg";
+import checkerboardUrl from "./assets/checkerboard-1024x1024.png";
+import checkerboardUrlSmall from "./assets/checkerboard-8×8.png";
+import metalUrl from "./assets/Metal_pattern_007d.png";
 
 /**
  * Base
@@ -64,14 +67,24 @@ manager.onError = (url) => {
 const textureLoader = new THREE.TextureLoader(manager);
 const doorTexture = textureLoader.load(doorUrl);
 const iceTexture = textureLoader.load(iceUrl);
+const checkerboardTexture = textureLoader.load(checkerboardUrl);
+const checkerboardTextureSmall = textureLoader.load(checkerboardUrlSmall);
+const metalTexture = textureLoader.load(metalUrl);
 
-// 创建一个球体
-const geometry = new THREE.SphereGeometry(1, 32, 32);
+iceTexture.minFilter = THREE.NearestFilter;
+iceTexture.magFilter = THREE.NearestFilter;
+iceTexture.generateMipmaps = false;
+
+// 立方体
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 
 // Object
 const mesh = new THREE.Mesh(
   geometry,
-  new THREE.MeshBasicMaterial({ map: iceTexture, wireframe: false })
+  new THREE.MeshBasicMaterial({
+    map: iceTexture,
+    wireframe: false,
+  })
 );
 scene.add(mesh);
 
