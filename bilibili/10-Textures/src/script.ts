@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+import GUI from "lil-gui";
+
 import doorUrl from "./assets/door.jpeg";
 import iceUrl from "./assets/ice_surface.jpeg";
 import checkerboardUrl from "./assets/checkerboard-1024x1024.png";
@@ -8,6 +10,13 @@ import checkerboardUrlSmall from "./assets/checkerboard-8×8.png";
 import metalUrl from "./assets/Metal_pattern_007d.png";
 import alphaUrl from "./assets/alphamap.png";
 import matCapUrl from "./assets/matcaps/6.png";
+import blueGradient from "./assets/matcaps/蓝色渐变.png";
+
+const gui = new GUI({
+  width: 340,
+  title: "Nice debug ui",
+  closeFolders: true,
+});
 
 /**
  * Base
@@ -74,6 +83,7 @@ const checkerboardTextureSmall = textureLoader.load(checkerboardUrlSmall);
 const metalTexture = textureLoader.load(metalUrl);
 const alphaTexture = textureLoader.load(alphaUrl);
 const matCapTexture = textureLoader.load(matCapUrl);
+const blueGradientTexture = textureLoader.load(blueGradient);
 
 // 立方体
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -102,9 +112,38 @@ const torusGeometry = new THREE.TorusGeometry(0.4, 0.2, 16, 32);
 //   flatShading: true,
 // });
 
-const material = new THREE.MeshMatcapMaterial({
-  matcap: matCapTexture,
+// const material = new THREE.MeshMatcapMaterial({
+//   matcap: blueGradientTexture,
+// });
+
+// 环境光
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+// 点光源
+const pointLight = new THREE.PointLight(0xffffff, 0.5);
+pointLight.position.set(2, 3, 4);
+scene.add(pointLight);
+
+// 创建深度材质
+// const material = new THREE.MeshDepthMaterial();
+
+// const material = new THREE.MeshLambertMaterial({});
+
+// const material = new THREE.MeshPhongMaterial({
+//   specular: 0x1188ff, // 高光颜色
+//   shininess: 30, // 高光强度
+// });
+
+const material = new THREE.MeshStandardMaterial({
+  // color: 0x0077ff, // 基础颜色
+  metalness: 0.5, // 金属度
+  roughness: 0.5, // 粗糙度
+  map: doorTexture,
 });
+
+gui.add(material, "metalness").min(0).max(1).step(0.01).name("金属度");
+gui.add(material, "roughness").min(0).max(1).step(0.01).name("粗糙度");
 
 // Object
 const boxMesh = new THREE.Mesh(boxGeometry, material);
