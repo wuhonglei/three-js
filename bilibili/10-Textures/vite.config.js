@@ -15,4 +15,5 @@ export default {
     emptyOutDir: true,
     sourcemap: true,
   },
+  assetsInclude: ["**/*.hdr"],
 };

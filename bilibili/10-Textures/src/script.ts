@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { PMREMGenerator } from "three";
 
 import GUI from "lil-gui";
 
@@ -11,6 +13,16 @@ import metalUrl from "./assets/Metal_pattern_007d.png";
 import alphaUrl from "./assets/alphamap.png";
 import matCapUrl from "./assets/matcaps/6.png";
 import blueGradient from "./assets/matcaps/蓝色渐变.png";
+
+import pxUrl from "./assets/standard-cube-map/px.png";
+import nxUrl from "./assets/standard-cube-map/nx.png";
+import pyUrl from "./assets/standard-cube-map/py.png";
+import nyUrl from "./assets/standard-cube-map/ny.png";
+import pzUrl from "./assets/standard-cube-map/pz.png";
+import nzUrl from "./assets/standard-cube-map/nz.png";
+
+import gardenUrl from "./assets/symmetrical_garden_02_4k.hdr";
+import brownUrl from "./assets/brown_photostudio_01_4k.hdr";
 
 const gui = new GUI({
   width: 340,
@@ -62,19 +74,6 @@ window.addEventListener("dblclick", () => {
 const scene = new THREE.Scene();
 
 const manager = new THREE.LoadingManager();
-
-manager.onLoad = () => {
-  // console.log("onLoad");
-};
-
-manager.onProgress = (url, itemsLoaded, itemsTotal) => {
-  // console.log("onProgress", url, itemsLoaded, itemsTotal);
-};
-
-manager.onError = (url) => {
-  console.log("onError", url);
-};
-
 const textureLoader = new THREE.TextureLoader(manager);
 const doorTexture = textureLoader.load(doorUrl);
 const iceTexture = textureLoader.load(iceUrl);
@@ -84,6 +83,18 @@ const metalTexture = textureLoader.load(metalUrl);
 const alphaTexture = textureLoader.load(alphaUrl);
 const matCapTexture = textureLoader.load(matCapUrl);
 const blueGradientTexture = textureLoader.load(blueGradient);
+
+const cubeLoader = new THREE.CubeTextureLoader();
+const cubeTexture = cubeLoader.load([pxUrl, nxUrl, pyUrl, nyUrl, pzUrl, nzUrl]);
+console.info("pxUrl", pxUrl);
+
+// 加载 HDRI 文件
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load(brownUrl, (texture) => {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = texture;
+  scene.environment = texture;
+});
 
 // 立方体
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -96,25 +107,6 @@ const planeGeometry = new THREE.PlaneGeometry(1, 1, 100, 100);
 
 // torus
 const torusGeometry = new THREE.TorusGeometry(0.4, 0.2, 16, 32);
-
-// const material = new THREE.MeshBasicMaterial({
-//   // color: "purple",
-//   map: iceTexture,
-//   // alphaMap: alphaTexture,
-//   transparent: true, // 启用透明度
-//   opacity: 1, // 设置不透明度
-// });
-// material.side = THREE.DoubleSide;
-
-// const material = new THREE.MeshNormalMaterial({
-//   wireframe: false,
-//   wireframeLinewidth: 5,
-//   flatShading: true,
-// });
-
-// const material = new THREE.MeshMatcapMaterial({
-//   matcap: blueGradientTexture,
-// });
 
 // 环境光
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -136,10 +128,9 @@ scene.add(pointLight);
 // });
 
 const material = new THREE.MeshStandardMaterial({
-  // color: 0x0077ff, // 基础颜色
-  metalness: 0.5, // 金属度
-  roughness: 0.5, // 粗糙度
-  map: doorTexture,
+  metalness: 0.5,
+  roughness: 0,
+  envMap: cubeTexture,
 });
 
 gui.add(material, "metalness").min(0).max(1).step(0.01).name("金属度");
@@ -151,11 +142,11 @@ const sphereMesh = new THREE.Mesh(sphereGeometry, material);
 const planeMesh = new THREE.Mesh(planeGeometry, material);
 const torusMesh = new THREE.Mesh(torusGeometry, material);
 
-boxMesh.position.x = -1.5;
+// boxMesh.position.x = -1.5;
 sphereMesh.position.x = 0;
 torusMesh.position.x = 1.5;
 
-scene.add(boxMesh, sphereMesh, planeMesh, torusMesh);
+scene.add(boxMesh);
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
