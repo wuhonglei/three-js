@@ -44,6 +44,8 @@ window.addEventListener("dblclick", () => {
   }
 });
 
+const textureLoader = new THREE.TextureLoader();
+
 // Scene
 const scene = new THREE.Scene();
 
@@ -63,29 +65,51 @@ loader.load("fonts/optimer_regular.typeface.json", (font) => {
     bevelSegments: 5,
   });
 
+  const matcapTexture = textureLoader.load("textures/matcaps/1.png");
+  const matcapTexture1 = textureLoader.load("textures/matcaps/2.png");
+
   // 创建材质
-  const material = new THREE.MeshBasicMaterial({
-    color: "red",
-    wireframe: true,
-  });
+  const material = new THREE.MeshMatcapMaterial({});
+  material.matcap = matcapTexture;
 
   // 创建网格并添加到场景
   const textMesh = new THREE.Mesh(textGeometry, material);
-  // 将字体放在中心
-  // textGeometry.computeBoundingBox();
-  textGeometry.center();
   // 打印字体位置
-  console.info("textGeometry.boundingBox", textGeometry.boundingBox);
+  textGeometry.center();
+  const { min, max } = textGeometry.boundingBox!;
+  console.info(min);
+  console.info(max);
 
   scene.add(textMesh);
-});
 
-// Object
-const mesh = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false })
-);
-// scene.add(mesh);
+  // 创建一个甜甜圈
+  const donutMaterial = new THREE.MeshMatcapMaterial({
+    matcap: matcapTexture1,
+  });
+  console.time("donut");
+  const geometry = new THREE.TorusGeometry(0.3, 0.2, 16, Math.PI * 32);
+  for (let i = 0; i < 100; i++) {
+    const donut = new THREE.Mesh(geometry, donutMaterial);
+
+    donut.position.set(
+      Math.sin(((Math.random() * 2 - 1) * Math.PI) / 2) * 5,
+      Math.sin(((Math.random() * 2 - 1) * Math.PI) / 2) * 5,
+      Math.sin(((Math.random() * 2 - 1) * Math.PI) / 2) * 5
+    );
+
+    donut.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
+
+    const scale = Math.random() * 2;
+    donut.scale.set(scale, scale, scale);
+
+    scene.add(donut);
+  }
+  console.timeEnd("donut");
+});
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
@@ -95,7 +119,6 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 camera.position.set(0, 0, 3);
-camera.lookAt(mesh.position);
 scene.add(camera);
 
 // Renderer
