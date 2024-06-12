@@ -44,12 +44,57 @@ window.addEventListener("dblclick", () => {
 // Scene
 const scene = new THREE.Scene();
 
-// Object
-const mesh = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false })
+const material = new THREE.MeshStandardMaterial({
+  color: 0x00ff00, // 绿色
+  metalness: 0.5, // 中等金属感
+  roughness: 0.1, // 低粗糙度，高光泽
+});
+
+// Step 3: 添加光源
+const ambientLight = new THREE.AmbientLight(0x404040, 2); // 环境光
+scene.add(ambientLight);
+
+const pointLight2 = new THREE.PointLight(0xffffff, 0.7); // 点光源
+pointLight2.position.set(0, 5, 5);
+scene.add(pointLight2);
+
+// direction light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+directionalLight.position.set(0, 5, 5);
+// scene.add(directionalLight);
+
+// hemisphere light
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.5);
+hemisphereLight.position.set(0, 5, 0);
+scene.add(hemisphereLight);
+
+// sphere
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
+sphere.position.set(-1.5, 0, 0);
+
+// cube
+const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+
+// donut
+const donut = new THREE.Mesh(
+  new THREE.TorusGeometry(0.3, 0.2, 32, 64),
+  material
 );
-scene.add(mesh);
+donut.position.set(1.5, 0, 0);
+
+// plane
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(5, 3, 1, 1),
+  new THREE.MeshStandardMaterial({
+    color: 0xdddddd, // 绿色
+    metalness: 0.5, // 中等金属感
+    roughness: 0.7, // 低粗糙度，高光泽
+  })
+);
+plane.rotation.x = -Math.PI * 0.5;
+plane.position.y = -0.6;
+
+scene.add(sphere, cube, donut, plane);
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
@@ -59,7 +104,7 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 camera.position.set(0, 0, 3);
-camera.lookAt(mesh.position);
+camera.lookAt(cube.position);
 scene.add(camera);
 
 // Renderer
